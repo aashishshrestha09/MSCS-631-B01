@@ -15,9 +15,9 @@ Lab1/
 
 ## Requirements
 
-| Dependency | Version           |
-| ---------- | ----------------- | ------------------- |
-| Python     | ≥ 3.10 (uses `str | None` union syntax) |
+| Dependency | Version                                  |
+| ---------- | ---------------------------------------- |
+| Python     | ≥ 3.10 (uses `str \| None` union syntax) |
 
 No third-party packages are required. All functionality relies on Python's standard library.
 
