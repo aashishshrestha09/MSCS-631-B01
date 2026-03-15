@@ -1,0 +1,5 @@
+# Wireshark Lab 2 – ICMP
+# Python >= 3.10 required
+
+# Packet capture analysis
+pyshark>=0.6
