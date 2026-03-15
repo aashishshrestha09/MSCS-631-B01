@@ -1,8 +1,11 @@
 """
-Print the annotated lab report that answers all 10 Wireshark Lab 2 questions.
+Lab report generation: stdout printer and Markdown file writer.
+Answers all 10 Wireshark Lab 2 questions.
 """
 
 from __future__ import annotations
+
+from pathlib import Path
 
 from .models import AnalysisResults, ICMPPacketInfo
 

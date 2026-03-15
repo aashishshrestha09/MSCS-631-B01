@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Optional
 
@@ -40,9 +42,13 @@ def analyze_pcap(pcap_file: Path, wait_timeout: int = 30) -> AnalysisResults:
     results = AnalysisResults()
 
     try:
-        cap = pyshark.FileCapture(str(pcap_file), display_filter="icmp")
-        packets = list(cap)
-        cap.close()
+        # pyshark uses asyncio internally. On Python 3.10+ there may already be
+        # a running event loop in the main thread, which causes:
+        #   "There is already a running event loop"
+        # Running the capture in a fresh thread (with its own event loop) avoids
+        # this reliably on all platforms.
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            packets = list(pool.submit(_read_packets, str(pcap_file)).result())
     except Exception as exc:
         logger.error("pyshark error reading %s: %s", pcap_file, exc)
         return results
@@ -86,6 +92,25 @@ def analyze_pcap(pcap_file: Path, wait_timeout: int = 30) -> AnalysisResults:
 
 
 # Helpers
+
+def _read_packets(pcap_path: str) -> list:
+    """
+    Open *pcap_path* with pyshark in a thread that owns its own event loop.
+
+    This avoids the ``"There is already a running event loop"`` error that
+    pyshark raises on Python 3.10+ when called from the main thread.
+    """
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        cap = pyshark.FileCapture(pcap_path, display_filter="icmp")
+        pkts = list(cap)
+        cap.close()
+        return pkts
+    finally:
+        loop.close()
+
+
 def _wait_for_file(path: Path, timeout: int) -> None:
     """Block until *path* exists or *timeout* seconds elapse."""
     deadline = time.monotonic() + timeout

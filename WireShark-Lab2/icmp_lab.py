@@ -32,10 +32,11 @@ from icmp_lab.config import (
     DEFAULT_CAPTURE_DURATION,
     DEFAULT_CAPTURE_FILE,
     DEFAULT_PING_COUNT,
+    DEFAULT_REPORT_FILE,
     DEFAULT_TARGET_HOST,
 )
 from icmp_lab.network import run_ping, run_traceroute
-from icmp_lab.report import print_report
+from icmp_lab.report import print_report, save_report_md
 
 logging.basicConfig(
     level=logging.INFO,
@@ -97,6 +98,13 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Skip live capture; analyse an existing .pcap file instead",
     )
     parser.add_argument(
+        "--report", "-r",
+        type=Path,
+        default=DEFAULT_REPORT_FILE,
+        metavar="FILE",
+        help="Output path for the Markdown report file",
+    )
+    parser.add_argument(
         "--verbose", "-v",
         action="store_true",
         help="Enable DEBUG-level logging",
@@ -151,6 +159,8 @@ def main() -> int:
         results = analyze_pcap(args.output)
 
     print_report(results, ping_output, traceroute_output)
+    save_report_md(results, ping_output, traceroute_output, args.report)
+    logger.info("Markdown report saved to %s", args.report)
     return 0
 
 
