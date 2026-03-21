@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+import pyshark
 
 from .models import AnalysisResults, UDPPacketInfo
 
@@ -37,9 +40,16 @@ def _wait_for_file(path: str | Path, timeout: float = 30) -> bool:
 
 def _read_packets(pcap_file: str) -> list:
     """Read packets inside a dedicated thread (avoids event-loop conflicts)."""
-    import pyshark  # imported here so the thread gets its own event loop
 
-    cap = pyshark.FileCapture(pcap_file, display_filter="udp")
+    # Python 3.14 no longer provides an implicit event loop per thread.
+    # Ensure this worker thread has one before initializing pyshark.
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    cap = pyshark.FileCapture(pcap_file, display_filter="udp", eventloop=loop)
     packets = list(cap)
     cap.close()
     return packets
