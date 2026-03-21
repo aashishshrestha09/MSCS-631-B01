@@ -1,0 +1,12 @@
+# Lab 3 – SMTP Mail Client dependencies
+#
+# Install into a virtual environment (recommended):
+#   python -m venv .venv
+#   source .venv/bin/activate          # macOS / Linux
+#   .venv\Scripts\activate             # Windows
+#   pip install -r Lab3/requirements.txt
+#
+# aiosmtpd – local debug SMTP server (replaces smtpd removed in Python 3.12+)
+aiosmtpd==1.4.6
+# python-dotenv – load credentials from a .env file
+python-dotenv==1.2.2
