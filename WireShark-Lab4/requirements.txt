@@ -1,0 +1,8 @@
+# Wireshark Lab 4 – 802.11 WiFi
+# Python >= 3.10 required
+
+# Packet capture analysis
+pyshark>=0.6
+
+# HTTP download of trace files
+requests>=2.28
