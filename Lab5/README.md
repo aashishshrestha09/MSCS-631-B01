@@ -6,9 +6,11 @@ A simple HTTP web proxy server that handles GET requests and caches responses lo
 
 ## Files
 
-| File             | Description                           |
-| ---------------- | ------------------------------------- |
-| `ProxyServer.py` | Completed proxy server implementation |
+| File / Folder     | Description                                            |
+| ----------------- | ------------------------------------------------------ |
+| `ProxyServer.py`  | Completed proxy server implementation                  |
+| `img/`            | Screenshots verifying proxy and cache behavior         |
+| `www.example.com` | Example cache file written to disk after first request |
 
 ## Requirements
 
@@ -58,4 +60,25 @@ Then navigate to any HTTP URL normally (e.g., `http://www.example.com`).
 ## Notes
 
 - Only HTTP (port 80) is supported; HTTPS is not handled.
-- Cache files are stored in the working directory, mirroring the hostname path.
+- Cache files are stored in the working directory, mirroring the hostname path (e.g., `www.example.com`).
+- Designed for educational use; not intended for production deployment.
+
+## Screenshots
+
+### Proxy Startup & First Request (Cache Miss)
+
+![Proxy startup and first request — cache miss](img/proxy-service-startup-first-request-cache-miss.JPG)
+
+The proxy binds to port 8888, accepts the client's TCP connection, parses the GET request, forwards it to the origin server on port 80, and returns `HTTP/1.0 200 OK` with the full response body.
+
+### Second Request (Cache Hit)
+
+![Second request — cache hit](img/second-request-cache-hit.JPG)
+
+The identical request is re-issued immediately. The proxy logs `Read from cache` and serves the response directly from disk — no round-trip to the origin server.
+
+### Cache File on Disk
+
+![Cache file written to disk](img/cache-file.JPG)
+
+The cached response file (`www.example.com`) is written to the working directory after the first fetch and reused for all subsequent requests to the same host.
