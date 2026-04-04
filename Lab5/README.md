@@ -6,11 +6,11 @@ A simple HTTP web proxy server that handles GET requests and caches responses lo
 
 ## Files
 
-| File / Folder     | Description                                            |
-| ----------------- | ------------------------------------------------------ |
-| `ProxyServer.py`  | Completed proxy server implementation                  |
-| `img/`            | Screenshots verifying proxy and cache behavior         |
-| `www.example.com` | Example cache file written to disk after first request |
+| File / Folder    | Description                                                               |
+| ---------------- | ------------------------------------------------------------------------- |
+| `ProxyServer.py` | Completed proxy server implementation                                     |
+| `img/`           | Screenshots verifying proxy and cache behavior                            |
+| `cache/`         | Cached origin responses (for example, `cache/www.example.com/index.html`) |
 
 ## Requirements
 
@@ -33,12 +33,12 @@ The proxy listens on port **8888** by default.
 
 ## Usage
 
-### Direct URL in Browser
+### Quick Command-Line Test
 
-With the proxy running, navigate to:
+With the proxy running, issue a request through the proxy:
 
-```
-http://localhost:8888/www.example.com
+```bash
+curl.exe -x http://localhost:8888 http://www.example.com/
 ```
 
 ### Configure Browser Proxy Settings
@@ -53,14 +53,14 @@ Then navigate to any HTTP URL normally (e.g., `http://www.example.com`).
 ## How Caching Works
 
 1. The proxy parses the hostname from the incoming GET request.
-2. It checks for a local cache file matching the requested path.
+2. It checks for a local cache file under `cache/<host>/<path>`.
 3. **Cache hit:** Responds immediately with the cached content (`HTTP/1.0 200 OK`).
-4. **Cache miss:** Opens a TCP connection to the origin server on port 80, fetches the full response, writes it to disk, and forwards it to the client.
+4. **Cache miss:** Opens a TCP connection to the origin server on port 80, fetches the full response, writes it to disk (root path is stored as `index.html`), and forwards it to the client.
 
 ## Notes
 
 - Only HTTP (port 80) is supported; HTTPS is not handled.
-- Cache files are stored in the working directory, mirroring the hostname path (e.g., `www.example.com`).
+- Cache files are stored under `cache/`, mirroring host and path (e.g., `cache/www.example.com/index.html`).
 - Designed for educational use; not intended for production deployment.
 
 ## Screenshots
@@ -77,8 +77,8 @@ The proxy binds to port 8888, accepts the client's TCP connection, parses the GE
 
 The identical request is re-issued immediately. The proxy logs `Read from cache` and serves the response directly from disk — no round-trip to the origin server.
 
-### Cache File on Disk
+### Cache File on Disk (`cache/www.example.com/index.html`)
 
-![Cache file written to disk](img/cache-file.JPG)
+![Cache file written to cache/www.example.com/index.html](img/cache-file.JPG)
 
-The cached response file (`www.example.com`) is written to the working directory after the first fetch and reused for all subsequent requests to the same host.
+The cached response is written under `cache/` (for example, `cache/www.example.com/index.html`) after the first fetch and reused for all subsequent requests to the same host/path.
