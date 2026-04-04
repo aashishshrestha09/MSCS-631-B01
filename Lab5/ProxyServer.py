@@ -1,6 +1,7 @@
 from socket import *
 import sys
 import os
+from urllib.parse import urlsplit
 
 if len(sys.argv) <= 1:
     print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server]')
@@ -8,6 +9,7 @@ if len(sys.argv) <= 1:
 
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
+CACHE_ROOT = "cache"
 
 # Fill in start
 tcpSerSock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -30,10 +32,46 @@ while 1:
 
     # Extract the filename from the given message
     try:
-        print(message.split()[1])
-        filename = message.split()[1].partition("/")[2]
+        parts = message.split()
+        method = parts[0]
+        raw_target = parts[1]
+        print(raw_target)
+
+        parsed = urlsplit(raw_target)
+        if parsed.scheme and parsed.netloc:
+            origin_host = parsed.hostname or parsed.netloc
+            origin_port = parsed.port or 80
+            origin_path = parsed.path or "/"
+            if parsed.query:
+                origin_path += "?" + parsed.query
+        else:
+            host_header = ""
+            for line in message.splitlines():
+                if line.lower().startswith("host:"):
+                    host_header = line.split(":", 1)[1].strip()
+                    break
+            if not host_header:
+                raise ValueError("Missing Host header")
+            host_only, _, port_text = host_header.partition(":")
+            origin_host = host_only
+            origin_port = int(port_text) if port_text else 80
+            origin_path = raw_target if raw_target else "/"
+
+        if not origin_path.startswith("/"):
+            origin_path = "/" + origin_path
+
+        # Build a cache file path like host/path/to/file and map "/" to "index.html".
+        cache_rel_path = origin_path.lstrip("/")
+        if not cache_rel_path or cache_rel_path.endswith("/"):
+            cache_rel_path += "index.html"
+        cache_rel_path = cache_rel_path.replace("?", "__q__")
+        filename = os.path.join(CACHE_ROOT, origin_host, cache_rel_path)
         print(filename)
     except IndexError:
+        tcpCliSock.close()
+        continue
+    except Exception as e:
+        print("Invalid request:", e)
         tcpCliSock.close()
         continue
 
@@ -65,20 +103,19 @@ while 1:
             # Create a socket on the proxyserver
             c = socket(AF_INET, SOCK_STREAM)  # Fill in start  # Fill in end
 
-            hostn = filename.replace("www.", "", 1)
-            print(hostn)
+            print(origin_host)
 
             try:
                 # Connect to the socket to port 80
                 # Fill in start
-                c.connect((hostn, 80))
+                c.connect((origin_host, origin_port))
                 # Fill in end
 
                 # Create a temporary file on this socket and ask port 80
                 # for the file requested by the client
                 request = (
-                    "GET http://" + filename + " HTTP/1.0\r\n"
-                    "Host: " + hostn + "\r\n"
+                    method + " " + origin_path + " HTTP/1.0\r\n"
+                    "Host: " + origin_host + "\r\n"
                     "Connection: close\r\n\r\n"
                 )
                 c.sendall(request.encode())
