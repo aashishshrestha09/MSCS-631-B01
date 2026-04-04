@@ -6,11 +6,11 @@ A simple HTTP web proxy server that handles GET requests and caches responses lo
 
 ## Files
 
-| File / Folder     | Description                                            |
-| ----------------- | ------------------------------------------------------ |
-| `ProxyServer.py`  | Completed proxy server implementation                  |
-| `img/`            | Screenshots verifying proxy and cache behavior         |
-| `cache/`          | Cached origin responses (for example, `cache/www.example.com/index.html`) |
+| File / Folder    | Description                                                               |
+| ---------------- | ------------------------------------------------------------------------- |
+| `ProxyServer.py` | Completed proxy server implementation                                     |
+| `img/`           | Screenshots verifying proxy and cache behavior                            |
+| `cache/`         | Cached origin responses (for example, `cache/www.example.com/index.html`) |
 
 ## Requirements
 
@@ -82,46 +82,3 @@ The identical request is re-issued immediately. The proxy logs `Read from cache`
 ![Cache file written to cache/www.example.com/index.html](img/cache-file.JPG)
 
 The cached response is written under `cache/` (for example, `cache/www.example.com/index.html`) after the first fetch and reused for all subsequent requests to the same host/path.
-
-```text
-PS C:\Users\aashi\Documents\MSCS-631-B01\Lab5> python ProxyServer.py localhost
-Ready to serve...
-Received a connection from: ('127.0.0.1', 63886)
-HEAD http://www.example.com/ HTTP/1.1
-Host: www.example.com
-User-Agent: curl/8.13.0
-Accept: */*
-Proxy-Connection: Keep-Alive
-
-
-http://www.example.com/
-cache\www.example.com\index.html
-/cache\www.example.com\index.html
-Read from cache
-Ready to serve...
-Received a connection from: ('127.0.0.1', 63900)
-HEAD http://www.example.com/ HTTP/1.1
-Host: www.example.com
-User-Agent: curl/8.13.0
-Accept: */*
-Proxy-Connection: Keep-Alive
-
-
-http://www.example.com/
-cache\www.example.com\index.html
-/cache\www.example.com\index.html
-Read from cache
-Ready to serve...
-
-PS C:\Users\aashi\Documents\MSCS-631-B01\Lab5> curl.exe -x http://localhost:8888 http://www.example.com/ -I   
-HTTP/1.0 200 OK
-Content-Type:text/html
-
-PS C:\Users\aashi\Documents\MSCS-631-B01\Lab5> Get-ChildItem -Recurse cache | Select-Object 
-FullName,Length   
-   
-FullName                                                                    Length
---------                                                                    ------
-C:\Users\aashi\Documents\MSCS-631-B01\Lab5\cache\www.example.com
-C:\Users\aashi\Documents\MSCS-631-B01\Lab5\cache\www.example.com\index.html 268
-```
