@@ -131,6 +131,7 @@ def get_route(hostname):
 
     for ttl in range(1, MAX_HOPS):
         for tries in range(TRIES):
+            timeLeft = TIMEOUT          # reset per-try so it never goes negative
             destAddr = gethostbyname(hostname)
 
             # Fill in start
@@ -180,21 +181,28 @@ def get_route(hostname):
                     # Layout: [outer IP 20B][ICMP hdr 8B][orig IP 20B]
                     #         [orig ICMP hdr 8B][our payload]
                     # Timestamp is at offset 56 (20+8+20+8).
+                    # RFC 792 only requires routers to include 8 bytes of
+                    # the original datagram (the ICMP header), so the payload
+                    # timestamp may not be present. Fall back to wall-clock.
                     bytes_d  = struct.calcsize("d")
-                    timeSent = struct.unpack(
-                        "d", recvPacket[56:56 + bytes_d]
-                    )[0]
-                    rtt_ms = (timeReceived - timeSent) * 1000
+                    payload  = recvPacket[56:56 + bytes_d]
+                    if len(payload) == bytes_d:
+                        timeSent = struct.unpack("d", payload)[0]
+                        rtt_ms   = (timeReceived - timeSent) * 1000
+                    else:
+                        rtt_ms   = (timeReceived - t) * 1000
                     print(f"  {ttl}  rtt={rtt_ms:.2f} ms  {addr[0]}")
                     break   # move on to next TTL
 
                 elif types == ICMP_DEST_UNREACH:
                     # Destination Unreachable — report and stop.
                     bytes_d  = struct.calcsize("d")
-                    timeSent = struct.unpack(
-                        "d", recvPacket[56:56 + bytes_d]
-                    )[0]
-                    rtt_ms = (timeReceived - timeSent) * 1000
+                    payload  = recvPacket[56:56 + bytes_d]
+                    if len(payload) == bytes_d:
+                        timeSent = struct.unpack("d", payload)[0]
+                        rtt_ms   = (timeReceived - timeSent) * 1000
+                    else:
+                        rtt_ms   = (timeReceived - t) * 1000
                     print(f"  {ttl}  rtt={rtt_ms:.2f} ms  {addr[0]}  "
                           f"(Destination Unreachable – code {code})")
                     return
