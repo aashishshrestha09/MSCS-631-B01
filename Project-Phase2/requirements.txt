@@ -1,0 +1,9 @@
+# Phase 2 simulation dependencies
+# All packages are part of the Python standard library except optional plotting.
+
+# Core simulation uses only stdlib (random, statistics, math, collections, json)
+# No third-party packages are required to run run_simulation.py
+
+# Optional: install for chart generation with a custom visualisation script
+matplotlib>=3.8
+numpy>=1.26

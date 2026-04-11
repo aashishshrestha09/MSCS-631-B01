@@ -1,0 +1,102 @@
+{
+  "scalability": [
+    {
+      "device_count": 100,
+      "fog_node_count": 1,
+      "edge_avg_lat_ms": 2.64,
+      "edge_p95_lat_ms": 2.969,
+      "fog_avg_lat_ms": 10.552,
+      "fog_p95_lat_ms": 11.894,
+      "cloud_avg_lat_ms": 60.394,
+      "throughput_mps": 103.4,
+      "packet_loss_pct": 0.0,
+      "edge_blocked": 0
+    },
+    {
+      "device_count": 500,
+      "fog_node_count": 1,
+      "edge_avg_lat_ms": 3.408,
+      "edge_p95_lat_ms": 3.74,
+      "fog_avg_lat_ms": 13.613,
+      "fog_p95_lat_ms": 14.934,
+      "cloud_avg_lat_ms": 61.078,
+      "throughput_mps": 525.8,
+      "packet_loss_pct": 0.0,
+      "edge_blocked": 0
+    },
+    {
+      "device_count": 1000,
+      "fog_node_count": 1,
+      "edge_avg_lat_ms": 5.324,
+      "edge_p95_lat_ms": 5.752,
+      "fog_avg_lat_ms": 21.312,
+      "fog_p95_lat_ms": 23.054,
+      "cloud_avg_lat_ms": 62.14,
+      "throughput_mps": 1047.6,
+      "packet_loss_pct": 0.0,
+      "edge_blocked": 0
+    },
+    {
+      "device_count": 5000,
+      "fog_node_count": 4,
+      "edge_avg_lat_ms": 125.001,
+      "edge_p95_lat_ms": 125.329,
+      "fog_avg_lat_ms": 38.031,
+      "fog_p95_lat_ms": 100.85,
+      "cloud_avg_lat_ms": 73.052,
+      "throughput_mps": 5368.6,
+      "packet_loss_pct": 0.0,
+      "edge_blocked": 0
+    },
+    {
+      "device_count": 10000,
+      "fog_node_count": 7,
+      "edge_avg_lat_ms": 125.0,
+      "edge_p95_lat_ms": 125.331,
+      "fog_avg_lat_ms": 49.372,
+      "fog_p95_lat_ms": 98.1,
+      "cloud_avg_lat_ms": 93.272,
+      "throughput_mps": 10699.7,
+      "packet_loss_pct": 0.0,
+      "edge_blocked": 0
+    }
+  ],
+  "security": [
+    {
+      "test_name": "DDoS Volumetric Attack",
+      "total_attack_msgs": 118755,
+      "blocked_at_edge": 108263,
+      "flagged_at_fog": 6482,
+      "detection_time_s": 3.0,
+      "false_positives": 86,
+      "legitimate_impact_pct": 12.0
+    },
+    {
+      "test_name": "Unauthorized Device Access (Rogue/Spoofed Devices)",
+      "total_attack_msgs": 974,
+      "blocked_at_edge": 974,
+      "flagged_at_fog": 0,
+      "detection_time_s": 0.0,
+      "false_positives": 0,
+      "legitimate_impact_pct": 0.0
+    },
+    {
+      "test_name": "Anomaly Detection \u2013 Compromised IoT Devices (Botnet)",
+      "total_attack_msgs": 73,
+      "blocked_at_edge": 0,
+      "flagged_at_fog": 5,
+      "detection_time_s": 2.0,
+      "false_positives": 0,
+      "legitimate_impact_pct": 0.0
+    },
+    {
+      "test_name": "Port Scan / Network Reconnaissance",
+      "total_attack_msgs": 1024,
+      "blocked_at_edge": 1004,
+      "flagged_at_fog": 0,
+      "detection_time_s": 0.019,
+      "false_positives": 0,
+      "legitimate_impact_pct": 0.0
+    }
+  ]
+}
